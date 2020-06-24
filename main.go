@@ -3,8 +3,6 @@ package main
 import (
 	"database/sql"
 	"log"
-	"net/http"
-	"text/template"
 
 	"github.com/gin-gonic/gin"
 	_ "github.com/go-sql-driver/mysql"
@@ -12,9 +10,9 @@ import (
 
 // Person is the basic structure of a person record
 type Person struct {
-	ID    string	`json:"person_id"`
-	FName string	`json:"first_name"`
-	LName string	`json:"last_name"`
+	ID    string `json:"person_id"`
+	FName string `json:"first_name"`
+	LName string `json:"last_name"`
 }
 
 func dbConn() (db *sql.DB) {
@@ -30,38 +28,39 @@ func dbConn() (db *sql.DB) {
 	return db
 }
 
-var tmpl = template.Must(template.ParseGlob("form/*"))
-
 // GetPeople returns all records in the person table
 func GetPeople(c *gin.Context) {
-	var person Person
-	
-}
-
-func Index(w http.ResponseWriter, r *http.Request) {
 	db := dbConn()
 	selDB, err := db.Query("SELECT * FROM person")
 	if err != nil {
-		panic(err.Error())
+		panic(err.Error)
 	}
 
-	indiv := Person{}
-	res := []Person{}
+	person := Person{}
+	people := []Person{}
 	for selDB.Next() {
 		var id, fname, lname string
 		err = selDB.Scan(&id, &fname, &lname)
 		if err != nil {
-			panic(err.Error())
+			log.Println(err)
+			c.JSON(500, gin.H{
+				"error": err.Error(),
+			})
 		}
-		indiv.ID = id
-		indiv.FName = fname
-		indiv.LName = lname
-		res = append(res, indiv)
+		person.ID = id
+		person.FName = fname
+		person.LName = lname
+		people = append(people, person)
 	}
-	tmpl.ExecuteTemplate(w, "Index", res)
+
+	c.JSON(200, gin.H{
+		"result": people,
+	})
+
 	defer db.Close()
 }
 
+/*
 func Show(w http.ResponseWriter, r *http.Request) {
 	db := dbConn()
 	nId := r.URL.Query().Get("id")
@@ -155,15 +154,11 @@ func Delete(w http.ResponseWriter, r *http.Request) {
 	defer db.Close()
 	http.Redirect(w, r, "/", 301)
 }
-
+*/
 func main() {
-	log.Println("Server started on: http://localhost:8080")
-	http.HandleFunc("/", Index)
-	http.HandleFunc("/show", Show)
-	http.HandleFunc("/new", New)
-	http.HandleFunc("/edit", Edit)
-	http.HandleFunc("/insert", Insert)
-	http.HandleFunc("/update", Update)
-	http.HandleFunc("/delete", Delete)
-	http.ListenAndServe(":8080", nil)
+	r := gin.Default()
+
+	r.GET("/", GetPeople)
+
+	r.Run(":8000")
 }
