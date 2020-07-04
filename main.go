@@ -11,15 +11,16 @@ import (
 
 // User is the basic structure of a user record
 type User struct {
-	ID    			string	`json:"user_id"`
-	UserName		string	`json:"user_name"`
-	FName 			string	`json:"user_first_name"`
-	LName 			string	`json:"user_last_name"`
-	Password		string	`json:"password"`
-	PasswordChange	string	`json:"password_change"`
-	PasswordExpired	string	`json:"password_expired"`
-	LastLogon		string	`json:"last_logon"`
-	AccountLocked	string	`json:"account_locked"`
+	ID              string `json:"user_id"`
+	UserName        string `json:"user_name"`
+	UserEmail       string `json:"user_email"`
+	FName           string `json:"user_first_name"`
+	LName           string `json:"user_last_name"`
+	Password        string `json:"password"`
+	PasswordChange  string `json:"password_change"`
+	PasswordExpired string `json:"password_expired"`
+	LastLogon       string `json:"last_logon"`
+	AccountLocked   string `json:"account_locked"`
 }
 
 func dbConn() (db *sql.DB) {
@@ -46,8 +47,8 @@ func GetUsers(c *gin.Context) {
 	user := User{}
 	users := []User{}
 	for selDB.Next() {
-		var id, username, fname, lname, password, passwordchange, passwordexpired, lastlogon, accountlocked string
-		err = selDB.Scan(&id, &username, &fname, &lname, &password, &passwordchange, &passwordexpired, &lastlogon, &accountlocked)
+		var id, username, useremail, fname, lname, password, passwordchange, passwordexpired, lastlogon, accountlocked string
+		err = selDB.Scan(&id, &username, &useremail, &fname, &lname, &password, &passwordchange, &passwordexpired, &lastlogon, &accountlocked)
 		if err != nil {
 			log.Println(err)
 			c.JSON(500, gin.H{
@@ -56,6 +57,7 @@ func GetUsers(c *gin.Context) {
 		}
 		user.ID = id
 		user.UserName = username
+		user.UserEmail = useremail
 		user.FName = fname
 		user.LName = lname
 		user.Password = password
@@ -85,8 +87,8 @@ func GetUser(c *gin.Context) {
 	user := User{}
 	users := []User{}
 	for selDB.Next() {
-		var id, username, fname, lname, password, passwordchange, passwordexpired, lastlogon, accountlocked string
-		err = selDB.Scan(&id, &username, &fname, &lname, &password, &passwordchange, &passwordexpired, &lastlogon, &accountlocked)
+		var id, username, useremail, fname, lname, password, passwordchange, passwordexpired, lastlogon, accountlocked string
+		err = selDB.Scan(&id, &username, &useremail, &fname, &lname, &password, &passwordchange, &passwordexpired, &lastlogon, &accountlocked)
 		if err != nil {
 			log.Println(err)
 			c.JSON(500, gin.H{
@@ -95,6 +97,7 @@ func GetUser(c *gin.Context) {
 		}
 		user.ID = id
 		user.UserName = username
+		user.UserEmail = useremail
 		user.FName = fname
 		user.LName = lname
 		user.Password = password
@@ -117,8 +120,8 @@ func CreateUser(c *gin.Context) {
 	db := dbConn()
 	var user User
 	if err := c.BindJSON(&user); err == nil {
-		statement, _ := db.Prepare("CALL create_user (?, ?, ?, ?, ?, ?, ?, ?)")
-		statement.Exec(user.UserName, user.FName, user.LName, user.Password, user.PasswordChange, user.PasswordExpired, user.LastLogon, user.AccountLocked)
+		statement, _ := db.Prepare("CALL create_user (?, ?, ?, ?, ?, ?, ?, ?, ?)")
+		statement.Exec(user.UserName, user.UserEmail, user.FName, user.LName, user.Password, user.PasswordChange, user.PasswordExpired, user.LastLogon, user.AccountLocked)
 		if err != nil {
 			c.String(http.StatusInternalServerError, err.Error())
 		}
@@ -133,8 +136,8 @@ func UpdateUser(c *gin.Context) {
 	db := dbConn()
 	var user User
 	if err := c.BindJSON(&user); err == nil {
-		statement, _ := db.Prepare("CALL update_user (?, ?, ?, ?, ?, ?, ?, ?, ?)")
-		statement.Exec(user.ID, user.UserName, user.FName, user.LName, user.Password, user.PasswordChange, user.PasswordExpired, user.LastLogon, user.AccountLocked)
+		statement, _ := db.Prepare("CALL update_user (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
+		statement.Exec(user.ID, user.UserName, user.UserEmail, user.FName, user.LName, user.Password, user.PasswordChange, user.PasswordExpired, user.LastLogon, user.AccountLocked)
 		if err != nil {
 			c.String(http.StatusInternalServerError, err.Error())
 		}
