@@ -115,6 +115,46 @@ func GetUser(c *gin.Context) {
 	defer db.Close()
 }
 
+// GetUserUsername retrieves a record by username
+func GetUserUsername(c *gin.Context) {
+	nID := c.Param("user_name")
+	db := dbConn()
+	selDB, err := db.Query("CALL read_user_username(?)", nID)
+	if err != nil {
+		panic(err.Error)
+	}
+
+	user := User{}
+	users := []User{}
+	for selDB.Next() {
+		var id, username, useremail, fname, lname, password, passwordchange, passwordexpired, lastlogon, accountlocked string
+		err = selDB.Scan(&id, &username, &useremail, &fname, &lname, &password, &passwordchange, &passwordexpired, &lastlogon, &accountlocked)
+		if err != nil {
+			log.Println(err)
+			c.JSON(500, gin.H{
+				"error": err.Error(),
+			})
+		}
+		user.ID = id
+		user.UserName = username
+		user.UserEmail = useremail
+		user.FName = fname
+		user.LName = lname
+		user.Password = password
+		user.PasswordChange = passwordchange
+		user.PasswordExpired = passwordexpired
+		user.LastLogon = lastlogon
+		user.AccountLocked = accountlocked
+		users = append(users, user)
+	}
+
+	c.JSON(200, gin.H{
+		"result": users,
+	})
+
+	defer db.Close()
+}
+
 // CreateUser adds user information to the database
 func CreateUser(c *gin.Context) {
 	db := dbConn()
@@ -161,6 +201,7 @@ func main() {
 
 	r.GET("/v1/getusers", GetUsers)
 	r.GET("/v1/getuser/:user_id", GetUser)
+	r.GET("/v1/getuserusername/:user_name", GetUserUsername)
 	r.GET("/v1/deleteuser/:user_id", DeleteUser)
 	r.POST("/v1/createuser", CreateUser)
 	r.POST("/v1/updateuser", UpdateUser)
