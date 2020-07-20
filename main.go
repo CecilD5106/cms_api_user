@@ -27,7 +27,7 @@ func dbConn() (db *sql.DB) {
 	dbDriver := "mysql"
 	dbUser := "cgdavis"
 	dbPass := "DzftXvz$eR7VpY^h"
-	dbServer := "tcp(172.17.232.252:3306)"
+	dbServer := "tcp(172.17.228.53:3306)"
 	dbName := "cms"
 	db, err := sql.Open(dbDriver, dbUser+":"+dbPass+"@"+dbServer+"/"+dbName)
 	if err != nil {
