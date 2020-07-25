@@ -13,7 +13,7 @@ RUN go get -d github.com/go-sql-driver/mysql
 
 RUN CGO_ENABLED=0 go build -a -installsuffix cgo --ldflags "-s -w" -o /build/main
 
-FROM scratch
+FROM alpine
 
 RUN mkdir app
 
