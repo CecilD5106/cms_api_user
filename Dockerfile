@@ -1,28 +1,28 @@
 FROM golang:alpine as builder
 
-ENV GO111MODULE=on \
-    CGO_ENABLED=0 \
-    GOOS=linux \
-    GOARCH=amd64
+RUN MKDIR /build
 
 WORKDIR /build
 
-COPY go.mod .
-COPY go.sum .
-RUN go mod download
+COPY . /build/
 
-COPY . .
+RUN go get -d github.com/gin-gonic/gin
+RUN go get -d github.com/go-sql-driver/mysql
 
-RUN go build -o main .
+RUN CGO_ENABLED=0 go build -a -installsuffix cgo --ldflags "-s -w" -o /build/main
 
-WORKDIR /dist
+FROM scratch
 
-RUN cp /build/main .
+RUN mkdir /app
 
-FROM alpine
+WORKDIR /app
 
-COPY --from=builder /dist/main /
+RUN adduser -S -D -H -h /app appuser
 
-EXPOSE 8080
+USER appuser
 
-ENTRYPOINT ["/main"]
+COPY --from=builder /build/main /app/
+
+EXPOSE 8000
+
+ENTRYPOINT ["./main"]
