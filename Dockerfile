@@ -1,6 +1,6 @@
 FROM golang:alpine as builder
 
-RUN MKDIR /build
+RUN mkdir build
 
 WORKDIR /build
 
@@ -13,7 +13,7 @@ RUN CGO_ENABLED=0 go build -a -installsuffix cgo --ldflags "-s -w" -o /build/mai
 
 FROM scratch
 
-RUN mkdir /app
+RUN mkdir app
 
 WORKDIR /app
 
