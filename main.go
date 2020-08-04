@@ -117,9 +117,9 @@ func GetUser(c *gin.Context) {
 
 // GetUserUsername retrieves a record by username
 func GetUserUsername(c *gin.Context) {
-	nID := c.Param("user_name")
+	userName := c.Param("user_name")
 	db := dbConn()
-	selDB, err := db.Query("CALL read_user_username(?)", nID)
+	selDB, err := db.Query("CALL read_user_username(?)", userName)
 	if err != nil {
 		panic(err.Error)
 	}
