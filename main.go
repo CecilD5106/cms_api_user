@@ -25,9 +25,9 @@ type User struct {
 
 func dbConn() (db *sql.DB) {
 	dbDriver := "mysql"
-	dbUser := "cgdavis"
-	dbPass := "DzftXvz$eR7VpY^h"
-	dbServer := "tcp(172.17.222.72:3306)"
+	dbUser := "masterAdmin"
+	dbPass := "8JqpbWNsJ"
+	dbServer := "tcp(cms-mysql-5106.cd0zye2bcjt9.us-west-2.rds.amazonaws.com:3306)"
 	dbName := "cms"
 	db, err := sql.Open(dbDriver, dbUser+":"+dbPass+"@"+dbServer+"/"+dbName)
 	if err != nil {
