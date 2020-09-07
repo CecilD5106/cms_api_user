@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	_ "github.com/go-sql-driver/mysql"
@@ -21,6 +22,22 @@ type User struct {
 	PasswordExpired string `json:"password_expired"`
 	LastLogon       string `json:"last_logon"`
 	AccountLocked   string `json:"account_locked"`
+	AccessList      []Access
+}
+
+//Access is the level of access a user has
+type Access struct {
+	AccessID         string `json:"access_id"`
+	IDUser           string `json:"user_id"`
+	IDCourt          string `json:"court_id"`
+	CaseAccess       string `json:"case_access"`
+	PersonAccess     string `json:"person_access"`
+	AccountingAccess string `json:"accounting_access"`
+	JuryAccess       string `json:"jury_access"`
+	AttorneyAccess   string `json:"attorney_access"`
+	ConfigAccess     string `json:"configuration_access"`
+	SecurityLevel    string `json:"security_level"`
+	SealedCase       string `json:"sealed_case"`
 }
 
 func dbConn() (db *sql.DB) {
@@ -65,6 +82,39 @@ func GetUsers(c *gin.Context) {
 		user.PasswordExpired = passwordexpired
 		user.LastLogon = lastlogon
 		user.AccountLocked = accountlocked
+		iid, err := strconv.Atoi(id)
+		if err != nil {
+			panic(err.Error)
+		}
+		selDB02, err := db.Query("CALL read_access_userid(?)", iid)
+		if err != nil {
+			panic(err.Error)
+		}
+		access := Access{}
+		accessList := []Access{}
+		for selDB02.Next() {
+			var accessid, userid, courtid, caseaccess, personaccess, accountingaccess, juryaccess, attorneyaccess, configaccess, securitylevel, sealedcase string
+			err := selDB02.Scan(&accessid, &userid, &courtid, &caseaccess, &personaccess, &accountingaccess, &juryaccess, &attorneyaccess, &configaccess, &securitylevel, &sealedcase)
+			if err != nil {
+				log.Println(err)
+				c.JSON(500, gin.H{
+					"error": err.Error(),
+				})
+			}
+			access.AccessID = accessid
+			access.IDUser = userid
+			access.IDCourt = courtid
+			access.CaseAccess = caseaccess
+			access.PersonAccess = personaccess
+			access.AccountingAccess = accountingaccess
+			access.JuryAccess = juryaccess
+			access.AttorneyAccess = attorneyaccess
+			access.ConfigAccess = configaccess
+			access.SecurityLevel = securitylevel
+			access.SealedCase = sealedcase
+			accessList = append(accessList, access)
+		}
+		user.AccessList = accessList
 		users = append(users, user)
 	}
 
@@ -105,6 +155,39 @@ func GetUser(c *gin.Context) {
 		user.PasswordExpired = passwordexpired
 		user.LastLogon = lastlogon
 		user.AccountLocked = accountlocked
+		iid, err := strconv.Atoi(id)
+		if err != nil {
+			panic(err.Error)
+		}
+		selDB02, err := db.Query("CALL read_access_userid(?)", iid)
+		if err != nil {
+			panic(err.Error)
+		}
+		access := Access{}
+		accessList := []Access{}
+		for selDB02.Next() {
+			var accessid, userid, courtid, caseaccess, personaccess, accountingaccess, juryaccess, attorneyaccess, configaccess, securitylevel, sealedcase string
+			err := selDB02.Scan(&accessid, &userid, &courtid, &caseaccess, &personaccess, &accountingaccess, &juryaccess, &attorneyaccess, &configaccess, &securitylevel, &sealedcase)
+			if err != nil {
+				log.Println(err)
+				c.JSON(500, gin.H{
+					"error": err.Error(),
+				})
+			}
+			access.AccessID = accessid
+			access.IDUser = userid
+			access.IDCourt = courtid
+			access.CaseAccess = caseaccess
+			access.PersonAccess = personaccess
+			access.AccountingAccess = accountingaccess
+			access.JuryAccess = juryaccess
+			access.AttorneyAccess = attorneyaccess
+			access.ConfigAccess = configaccess
+			access.SecurityLevel = securitylevel
+			access.SealedCase = sealedcase
+			accessList = append(accessList, access)
+		}
+		user.AccessList = accessList
 		users = append(users, user)
 	}
 
@@ -145,6 +228,39 @@ func GetUserUsername(c *gin.Context) {
 		user.PasswordExpired = passwordexpired
 		user.LastLogon = lastlogon
 		user.AccountLocked = accountlocked
+		iid, err := strconv.Atoi(id)
+		if err != nil {
+			panic(err.Error)
+		}
+		selDB02, err := db.Query("CALL read_access_userid(?)", iid)
+		if err != nil {
+			panic(err.Error)
+		}
+		access := Access{}
+		accessList := []Access{}
+		for selDB02.Next() {
+			var accessid, userid, courtid, caseaccess, personaccess, accountingaccess, juryaccess, attorneyaccess, configaccess, securitylevel, sealedcase string
+			err := selDB02.Scan(&accessid, &userid, &courtid, &caseaccess, &personaccess, &accountingaccess, &juryaccess, &attorneyaccess, &configaccess, &securitylevel, &sealedcase)
+			if err != nil {
+				log.Println(err)
+				c.JSON(500, gin.H{
+					"error": err.Error(),
+				})
+			}
+			access.AccessID = accessid
+			access.IDUser = userid
+			access.IDCourt = courtid
+			access.CaseAccess = caseaccess
+			access.PersonAccess = personaccess
+			access.AccountingAccess = accountingaccess
+			access.JuryAccess = juryaccess
+			access.AttorneyAccess = attorneyaccess
+			access.ConfigAccess = configaccess
+			access.SecurityLevel = securitylevel
+			access.SealedCase = sealedcase
+			accessList = append(accessList, access)
+		}
+		user.AccessList = accessList
 		users = append(users, user)
 	}
 
